@@ -80,21 +80,14 @@ int hashInt1 (int valor, int mapSize) {
 }
 
 
-int hashInt2 (int valor,int mapSize, int try) {
+int hashInt2 (int valor, int mapSize, int try) {
 
-    int key = hashInt1(valor, mapSize);
+    int h1 = hashInt1(valor, mapSize); // slot base (posição inicial)
 
+    int primo_aux = 7;                          // primo menor que mapSize
+    int h2 = primo_aux - (valor % primo_aux);   // tamanho do pulo (nunca é 0)
 
-    
-
-
+    return (h1 + try * h2) % mapSize;           // nova posição após 'try' tentativas
 }
-
-
-
-
-
-
-
 
 
