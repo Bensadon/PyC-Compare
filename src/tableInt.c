@@ -1,93 +1,71 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
-
 
 /*
 Monta as hash tables com as entradas
 */
 
-
-
-
-typedef struct Item_int{
-    int valor;
-    bool occupied;
+typedef struct Item_int {
+  int valor;
+  bool occupied;
 } Item_int;
 
+int menorPrimo(int mapSize) {}
 
+// recebe entrada
 
-int menorPrimo (int mapSize){
+int *entradaInt(int tam) {
 
+  int *vetor = (int *)malloc(tam * sizeof(int));
 
+  if (vetor == NULL)
+    return NULL;
 
+  for (int i = 0; i < tam; i++) {
+    if (scanf("%d", &vetor[i]) != 1)
+      break;
+  }
 
+  return vetor;
 }
 
+Item_int *criateTable(int *vetor, int mapSize, int tamVet) {
 
+  int i = 0;
 
-//recebe entrada
+  Item_int *table = (Item_int *)calloc(mapSize, sizeof(Item_int));
 
-int* entradaInt (int tam) {
-
-    int* vetor = (int*) malloc (tam * sizeof(int));
-
-    if (vetor == NULL) return NULL;
-
-    for (int i = 0; i < tam; i++){
-        if (scanf("%d" , &vetor[i]) != 1) break;
-    }
-
-    return vetor;
-}
-
-
-
-Item_int* criateTable (int *vetor, int mapSize, int tamVet) { 
-
-    int i = 0;
-
-    Item_int *table = (Item_int *) calloc (mapSize, sizeof(Item_int));
-
-    while (i < tamVet - 1) {
-        
-        int key;
-        int j = 1;
-
-        key = hashInt1 (vetor[i], mapSize);
-        
-        while (table[key].occupied == true) {
-
-            key = hashInt2 (vetor[i], mapSize, j);
-            j++;
-        }
-
-        table[key].valor = vetor[i];
-        table[key].occupied = true;
-        i++;
-    }
-
-    return table;
-}
-
-
-int hashInt1 (int valor, int mapSize) {
+  while (i < tamVet - 1) {
 
     int key;
+    int j = 1;
 
-    return key = valor % mapSize;
+    key = hashInt1(vetor[i], mapSize);
+
+    while (table[key].occupied == true) {
+
+      key = hashInt2(vetor[i], mapSize, j);
+      j++;
+    }
+
+    table[key].valor = vetor[i];
+    table[key].occupied = true;
+    i++;
+  }
+
+  return table;
 }
 
+int hashInt1(int valor, int mapSize) {
 
-int hashInt2 (int valor, int mapSize, int try) {
+  int key;
 
-    int h1 = hashInt1(valor, mapSize); // slot base (posição inicial)
-
-    int primo_aux = 7;                          // primo menor que mapSize
-    int h2 = primo_aux - (valor % primo_aux);   // tamanho do pulo (nunca é 0)
-
-    return (h1 + try * h2) % mapSize;           // nova posição após 'try' tentativas
+  return key = valor % mapSize;
 }
 
+int hashInt2(int valor, int mapSize, int try) {
 
+  int key = hashInt1(valor, mapSize);
+}
