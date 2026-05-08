@@ -17,6 +17,6 @@ char* insertionSortStr () {}
  
 char*mergeSortStr () {}
 
-char* quickSort () {}
+char* quickSortStr () {}
 
 

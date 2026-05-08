@@ -18,6 +18,14 @@ typedef struct Item_int{
 
 
 
+int menorPrimo (int mapSize){
+
+
+
+    
+}
+
+
 
 //recebe entrada
 
@@ -72,7 +80,15 @@ int hashInt1 (int valor, int mapSize) {
 }
 
 
-int hashInt2 (int valor,int mapSize, int try){}
+int hashInt2 (int valor,int mapSize, int try) {
+
+    int key = hashInt1(int valor, int mapSize);
+
+
+    
+
+
+}
 
 
 
