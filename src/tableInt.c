@@ -22,7 +22,7 @@ int menorPrimo (int mapSize){
 
 
 
-    
+
 }
 
 
@@ -82,7 +82,7 @@ int hashInt1 (int valor, int mapSize) {
 
 int hashInt2 (int valor,int mapSize, int try) {
 
-    int key = hashInt1(int valor, int mapSize);
+    int key = hashInt1(valor, mapSize);
 
 
     
