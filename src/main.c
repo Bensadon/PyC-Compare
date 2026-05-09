@@ -9,7 +9,7 @@
 #include <psapi.h>
 
 // Retorna o pico de memória do processo em bytes
-size_t getPeakMemory () {
++size_t getPeakMemory () {
   PROCESS_MEMORY_COUNTERS pmc;
   if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc)))
     return pmc.PeakWorkingSetSize;
@@ -82,23 +82,32 @@ void benchmarkInt (const char *caminho, int tamanho, int multiplicador) {
   tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
   printCSV("inteiro", tamanho, "hash_insercao", tempo, mem_depois - mem_antes);
 
-  // --- Busca de todos os elementos ---
-  inicio = clock();
-  for (int i = 0; i < tamanho; i++)
-    buscaInt(table, vetor[i], mapSize);
-  fim = clock();
-  tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
-  printCSV("inteiro", tamanho, "hash_busca", tempo, 0);
+  // --- Busca de 10 elementos aleatórios (média) ---
+  int nAmostras = (tamanho >= 100) ? 10 : 1;
+  srand(42);
+  double somaTempos = 0;
+  for (int s = 0; s < nAmostras; s++) {
+    int idx = rand() % tamanho;
+    inicio = clock();
+    buscaInt(table, vetor[idx], mapSize);
+    fim = clock();
+    somaTempos += (double)(fim - inicio) / CLOCKS_PER_SEC;
+  }
+  printCSV("inteiro", tamanho, "hash_busca", somaTempos / nAmostras, 0);
 
-  // --- Remoção de todos os elementos ---
+  // --- Remoção de 10 elementos aleatórios (média) ---
   int count = tamanho;
   int currentSize = mapSize;
-  inicio = clock();
-  for (int i = 0; i < tamanho; i++)
-    table = removeInt(table, vetor[i], currentSize, &count, &currentSize);
-  fim = clock();
-  tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
-  printCSV("inteiro", tamanho, "hash_remocao", tempo, 0);
+  srand(123);
+  somaTempos = 0;
+  for (int s = 0; s < nAmostras; s++) {
+    int idx = rand() % tamanho;
+    inicio = clock();
+    table = removeInt(table, vetor[idx], currentSize, &count, &currentSize);
+    fim = clock();
+    somaTempos += (double)(fim - inicio) / CLOCKS_PER_SEC;
+  }
+  printCSV("inteiro", tamanho, "hash_remocao", somaTempos / nAmostras, 0);
   free(table);
 
   // --- Insertion Sort ---
@@ -149,23 +158,32 @@ void benchmarkStr (const char *caminho, int tamanho, int multiplicador) {
   tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
   printCSV("string", tamanho, "hash_insercao", tempo, mem_depois - mem_antes);
 
-  // --- Busca de todos os elementos ---
-  inicio = clock();
-  for (int i = 0; i < tamanho; i++)
-    buscaStr(table, vetor[i], mapSize);
-  fim = clock();
-  tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
-  printCSV("string", tamanho, "hash_busca", tempo, 0);
+  // --- Busca de 10 elementos aleatórios (média) ---
+  int nAmostras = (tamanho >= 100) ? 10 : 1;
+  srand(42);
+  double somaTempos = 0;
+  for (int s = 0; s < nAmostras; s++) {
+    int idx = rand() % tamanho;
+    inicio = clock();
+    buscaStr(table, vetor[idx], mapSize);
+    fim = clock();
+    somaTempos += (double)(fim - inicio) / CLOCKS_PER_SEC;
+  }
+  printCSV("string", tamanho, "hash_busca", somaTempos / nAmostras, 0);
 
-  // --- Remoção de todos os elementos ---
+  // --- Remoção de 10 elementos aleatórios (média) ---
   int count = tamanho;
   int currentSize = mapSize;
-  inicio = clock();
-  for (int i = 0; i < tamanho; i++)
-    table = removeStr(table, vetor[i], currentSize, &count, &currentSize);
-  fim = clock();
-  tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
-  printCSV("string", tamanho, "hash_remocao", tempo, 0);
+  srand(123);
+  somaTempos = 0;
+  for (int s = 0; s < nAmostras; s++) {
+    int idx = rand() % tamanho;
+    inicio = clock();
+    table = removeStr(table, vetor[idx], currentSize, &count, &currentSize);
+    fim = clock();
+    somaTempos += (double)(fim - inicio) / CLOCKS_PER_SEC;
+  }
+  printCSV("string", tamanho, "hash_remocao", somaTempos / nAmostras, 0);
   free(table);
 
   // --- Insertion Sort ---

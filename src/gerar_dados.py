@@ -1,86 +1,83 @@
 """
 gerar_dados.py
 ==============
-Gera dados aleatórios (inteiros e strings) em arquivos .txt
-para uso nos testes de benchmark do projeto AEDII 2026.
+Gera arquivos de teste organizados para o benchmark.
+
+Estrutura:
+    dados/
+    ├── inteiros_10.txt
+    ├── inteiros_100.txt
+    ├── ...
+    ├── strings_10.txt
+    ├── strings_100.txt
+    └── ...
 
 Uso:
-    python gerar_dados.py
-
-Saída:
-    dados/inteiros_100.txt
-    dados/inteiros_1000.txt
-    dados/inteiros_10000.txt
-    dados/inteiros_100000.txt
-    dados/inteiros_1000000.txt
-    dados/strings_100.txt
-    ...
+    python src/gerar_dados.py
 """
 
+import os
 import random
 import string
-import os
 
-# ──────────────────────────────────────────────
-# CONFIGURAÇÕES
-# ──────────────────────────────────────────────
+PASTA_DADOS = "dados"
+TAMANHOS = [10, 100, 1_000, 10_000, 100_000]
 
-TAMANHOS = [100, 1_000, 10_000, 100_000, 1_000_000]
-
-INT_MIN = 0
-INT_MAX = 1_000_000
-
-STR_MIN_LEN = 4    # tamanho mínimo de cada string
-STR_MAX_LEN = 10   # tamanho máximo de cada string
-
-PASTA_SAIDA = "dados"
-
-# ──────────────────────────────────────────────
+# Descomente para incluir tamanhos maiores (cuidado: arquivos de vários GB!)
+# TAMANHOS += [10_000_000, 100_000_000]
 
 
-def gerar_inteiros(quantidade: int) -> list:
-    """Gera uma lista de inteiros aleatórios."""
-    return [random.randint(INT_MIN, INT_MAX) for _ in range(quantidade)]
+def gerar_string_aleatoria(tamanho_min=3, tamanho_max=15):
+    """Gera uma string aleatória com letras minúsculas."""
+    tam = random.randint(tamanho_min, tamanho_max)
+    return ''.join(random.choices(string.ascii_lowercase, k=tam))
 
 
-def gerar_strings(quantidade: int) -> list:
-    """Gera uma lista de strings aleatórias (letras minúsculas)."""
-    strings = []
-    for _ in range(quantidade):
-        tamanho = random.randint(STR_MIN_LEN, STR_MAX_LEN)
-        palavra = ''.join(random.choices(string.ascii_lowercase, k=tamanho))
-        strings.append(palavra)
-    return strings
+def gerar_inteiros(tamanho):
+    caminho = os.path.join(PASTA_DADOS, f"inteiros_{tamanho}.txt")
+    if os.path.exists(caminho):
+        print(f"  Já existe: {caminho}")
+        return
+
+    print(f"  Gerando {tamanho:>12,} inteiros... ", end="", flush=True)
+    with open(caminho, "w") as f:
+        for _ in range(tamanho):
+            f.write(f"{random.randint(-1_000_000_000, 1_000_000_000)}\n")
+    tamanho_mb = os.path.getsize(caminho) / (1024 * 1024)
+    print(f"OK ({tamanho_mb:.1f} MB)")
 
 
-def salvar_txt(dados: list, nome_arquivo: str) -> None:
-    """Salva uma lista de valores em um arquivo .txt (um valor por linha)."""
-    with open(nome_arquivo, 'w', encoding='utf-8') as f:
-        for item in dados:
-            f.write(f"{item}\n")
-    print(f"  [OK] {nome_arquivo}  ({len(dados)} itens)")
+def gerar_strings(tamanho):
+    caminho = os.path.join(PASTA_DADOS, f"strings_{tamanho}.txt")
+    if os.path.exists(caminho):
+        print(f"  Já existe: {caminho}")
+        return
+
+    print(f"  Gerando {tamanho:>12,} strings... ", end="", flush=True)
+    with open(caminho, "w") as f:
+        for _ in range(tamanho):
+            f.write(gerar_string_aleatoria() + "\n")
+    tamanho_mb = os.path.getsize(caminho) / (1024 * 1024)
+    print(f"OK ({tamanho_mb:.1f} MB)")
 
 
 def main():
-    os.makedirs(PASTA_SAIDA, exist_ok=True)
+    os.makedirs(PASTA_DADOS, exist_ok=True)
 
     print("=" * 50)
-    print("  Gerador de Dados — AEDII 2026")
+    print("  Gerador de Dados de Teste — PyC-Compare")
     print("=" * 50)
+    print(f"\n  Tamanhos: {[f'{t:,}' for t in TAMANHOS]}\n")
 
-    for tamanho in TAMANHOS:
-        print(f"\nGerando {tamanho:,} itens...")
+    print("  --- Inteiros ---")
+    for tam in TAMANHOS:
+        gerar_inteiros(tam)
 
-        # Inteiros
-        inteiros = gerar_inteiros(tamanho)
-        salvar_txt(inteiros, os.path.join(PASTA_SAIDA, f"inteiros_{tamanho}.txt"))
+    print("\n  --- Strings ---")
+    for tam in TAMANHOS:
+        gerar_strings(tam)
 
-        # Strings
-        strings = gerar_strings(tamanho)
-        salvar_txt(strings, os.path.join(PASTA_SAIDA, f"strings_{tamanho}.txt"))
-
-    print("\n" + "=" * 50)
-    print(f"  Concluído! Arquivos salvos em: ./{PASTA_SAIDA}/")
+    print(f"\n  Todos os arquivos em: {PASTA_DADOS}/")
     print("=" * 50)
 
 
