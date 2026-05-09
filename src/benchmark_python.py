@@ -4,8 +4,10 @@ benchmark_python.py
 Testa o desempenho do dict (Python) e do sorted() nativo
 com inteiros e strings.
 
+Mede tempo de execução e pico de memória (tracemalloc).
+
 Lê os .txt gerados pelo gerar_dados.py e salva os resultados em:
-    resultados/resultados_python.csv
+    results/resultados_python_v2.csv
 
 Uso:
     python benchmark_python.py
@@ -14,14 +16,15 @@ Uso:
 import time
 import os
 import csv
+import tracemalloc
 
 # ──────────────────────────────────────────────
 # CONFIGURAÇÕES
 # ──────────────────────────────────────────────
 
 TAMANHOS = [100, 1_000, 10_000, 100_000, 1_000_000]
-PASTA_RESULTADOS = "resultados"
-ARQUIVO_RESULTADO = os.path.join(PASTA_RESULTADOS, "resultados_python.csv")
+PASTA_RESULTADOS = "results"
+ARQUIVO_RESULTADO = os.path.join(PASTA_RESULTADOS, "resultados_python_v2.csv")
 
 # ──────────────────────────────────────────────
 # LEITURA DOS ARQUIVOS
@@ -36,43 +39,43 @@ def ler_strings(tamanho):
         return [linha.strip() for linha in f.readlines()]
 
 # ──────────────────────────────────────────────
+# MEDIÇÃO COM TEMPO + MEMÓRIA
+# ──────────────────────────────────────────────
+
+def medir(func, *args):
+    """Executa func(*args) medindo tempo e pico de memória."""
+    tracemalloc.start()
+    inicio = time.perf_counter()
+    resultado = func(*args)
+    fim = time.perf_counter()
+    _, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    return fim - inicio, peak, resultado
+
+# ──────────────────────────────────────────────
 # TESTES DO DICT
 # ──────────────────────────────────────────────
 
 def teste_insercao_dict(dados):
     d = {}
-    inicio = time.perf_counter()
     for i, valor in enumerate(dados):
         d[i] = valor
-    fim = time.perf_counter()
-    return fim - inicio
+    return d
 
-def teste_busca_dict(dados):
-    d = {i: valor for i, valor in enumerate(dados)}
-    inicio = time.perf_counter()
+def teste_busca_dict(d, dados):
     for i in range(len(dados)):
         _ = d[i]
-    fim = time.perf_counter()
-    return fim - inicio
 
-def teste_remocao_dict(dados):
-    d = {i: valor for i, valor in enumerate(dados)}
-    inicio = time.perf_counter()
+def teste_remocao_dict(d, dados):
     for i in range(len(dados)):
         del d[i]
-    fim = time.perf_counter()
-    return fim - inicio
 
 # ──────────────────────────────────────────────
 # TESTE DO SORTED
 # ──────────────────────────────────────────────
 
 def teste_sorted(dados):
-    copia = dados.copy()
-    inicio = time.perf_counter()
-    sorted(copia)
-    fim = time.perf_counter()
-    return fim - inicio
+    return sorted(dados)
 
 # ──────────────────────────────────────────────
 # MAIN
@@ -82,12 +85,12 @@ def main():
     os.makedirs(PASTA_RESULTADOS, exist_ok=True)
 
     print("=" * 50)
-    print("  Benchmark Python — AEDII 2026")
+    print("  Benchmark Python — AEDII 2026 (v2)")
     print("=" * 50)
 
     with open(ARQUIVO_RESULTADO, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(["linguagem", "tipo_dado", "tamanho", "operacao", "tempo_segundos"])
+        writer.writerow(["linguagem", "tipo_dado", "tamanho", "operacao", "tempo_segundos", "memoria_bytes"])
 
         for tamanho in TAMANHOS:
             print(f"\nTamanho: {tamanho:,}")
@@ -96,23 +99,26 @@ def main():
                 print(f"  Tipo: {tipo}")
                 dados = ler_dados(tamanho)
 
-                # Dict
-                t = teste_insercao_dict(dados)
-                print(f"    [dict] insercao:  {t:.6f}s")
-                writer.writerow(["python", tipo, tamanho, "dict_insercao", f"{t:.6f}"])
+                # Dict — inserção
+                t, mem, d = medir(teste_insercao_dict, dados)
+                print(f"    [dict] insercao:  {t:.6f}s  | mem: {mem:,} bytes")
+                writer.writerow(["python", tipo, tamanho, "dict_insercao", f"{t:.6f}", mem])
 
-                t = teste_busca_dict(dados)
-                print(f"    [dict] busca:     {t:.6f}s")
-                writer.writerow(["python", tipo, tamanho, "dict_busca", f"{t:.6f}"])
+                # Dict — busca
+                t, mem, _ = medir(teste_busca_dict, d, dados)
+                print(f"    [dict] busca:     {t:.6f}s  | mem: {mem:,} bytes")
+                writer.writerow(["python", tipo, tamanho, "dict_busca", f"{t:.6f}", mem])
 
-                t = teste_remocao_dict(dados)
-                print(f"    [dict] remocao:   {t:.6f}s")
-                writer.writerow(["python", tipo, tamanho, "dict_remocao", f"{t:.6f}"])
+                # Dict — remoção
+                d2 = dict(d)  # copia para não perder o dict
+                t, mem, _ = medir(teste_remocao_dict, d2, dados)
+                print(f"    [dict] remocao:   {t:.6f}s  | mem: {mem:,} bytes")
+                writer.writerow(["python", tipo, tamanho, "dict_remocao", f"{t:.6f}", mem])
 
                 # Sorted
-                t = teste_sorted(dados)
-                print(f"    [sorted]:         {t:.6f}s")
-                writer.writerow(["python", tipo, tamanho, "sorted", f"{t:.6f}"])
+                t, mem, _ = medir(teste_sorted, dados)
+                print(f"    [sorted]:         {t:.6f}s  | mem: {mem:,} bytes")
+                writer.writerow(["python", tipo, tamanho, "sorted", f"{t:.6f}", mem])
 
     print("\n" + "=" * 50)
     print(f"  Resultados salvos em: {ARQUIVO_RESULTADO}")

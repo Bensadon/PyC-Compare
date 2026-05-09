@@ -1,0 +1,5 @@
+linguagem,tipo_dado,tamanho,operacao,tempo_segundos,memoria_bytes
+python,inteiro,100000,dict_insercao,0.038758,10303980
+python,inteiro,100000,dict_busca,0.044040,801024
+python,inteiro,100000,dict_remocao,0.052866,801024
+python,inteiro,100000,sorted,0.019936,1199912
