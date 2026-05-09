@@ -64,7 +64,7 @@ void printCSV (const char *tipo, int tamanho, const char *operacao, double tempo
   printf("c,%s,%d,%s,%.6f,%lu\n", tipo, tamanho, operacao, tempo, (unsigned long)memoria);
 }
 
-void benchmarkInt (const char *caminho, int tamanho) {
+void benchmarkInt (const char *caminho, int tamanho, int multiplicador) {
   int *vetor = lerArquivoInt(caminho, tamanho);
   if (!vetor) return;
 
@@ -73,7 +73,7 @@ void benchmarkInt (const char *caminho, int tamanho) {
   size_t mem_antes, mem_depois;
 
   // --- Inserção na hash table ---
-  int mapSize = maiorPrimo(tamanho);
+  int mapSize = maiorPrimo(tamanho * multiplicador);
   mem_antes = getPeakMemory();
   inicio = clock();
   Item_int *table = criateTable(vetor, mapSize, tamanho);
@@ -131,7 +131,7 @@ void benchmarkInt (const char *caminho, int tamanho) {
   free(vetor);
 }
 
-void benchmarkStr (const char *caminho, int tamanho) {
+void benchmarkStr (const char *caminho, int tamanho, int multiplicador) {
   char **vetor = lerArquivoStr(caminho, tamanho);
   if (!vetor) return;
 
@@ -140,7 +140,7 @@ void benchmarkStr (const char *caminho, int tamanho) {
   size_t mem_antes, mem_depois;
 
   // --- Inserção na hash table ---
-  int mapSize = maiorPrimo(tamanho);
+  int mapSize = maiorPrimo(tamanho * multiplicador);
   mem_antes = getPeakMemory();
   inicio = clock();
   Item_str *table = criateTableStr(vetor, mapSize, tamanho);
@@ -202,20 +202,22 @@ void benchmarkStr (const char *caminho, int tamanho) {
 }
 
 int main (int argc, char *argv[]) {
-  if (argc != 4) {
-    printf("Uso: programa.exe <arquivo> <tipo> <tamanho>\n");
+  if (argc != 5) {
+    printf("Uso: programa.exe <arquivo> <tipo> <tamanho> <multiplicador>\n");
     printf("  tipo: inteiro | string\n");
+    printf("  multiplicador: 1=100%%, 2=50%%, 3=33%%\n");
     return 1;
   }
 
   const char *arquivo = argv[1];
   const char *tipo = argv[2];
   int tamanho = atoi(argv[3]);
+  int multiplicador = atoi(argv[4]);
 
   if (strcmp(tipo, "inteiro") == 0)
-    benchmarkInt(arquivo, tamanho);
+    benchmarkInt(arquivo, tamanho, multiplicador);
   else if (strcmp(tipo, "string") == 0)
-    benchmarkStr(arquivo, tamanho);
+    benchmarkStr(arquivo, tamanho, multiplicador);
   else
     printf("Tipo invalido: %s (use 'inteiro' ou 'string')\n", tipo);
 

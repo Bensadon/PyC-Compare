@@ -139,8 +139,7 @@ Item_str *removeStr (Item_str *table, const char *str, int mapSize, int *count, 
 
   while (table[key].occupied) {
     if (table[key].str != NULL && strcmp(table[key].str, str) == 0) {
-      free(table[key].str);   // libera a memória da string
-      table[key].str = NULL;  // sentinela: slot occupied mas vazio
+      table[key].str = NULL;  // sentinela: slot occupied mas vazio (não faz free, ponteiro compartilhado)
       (*count)--;
 
       if (*count > 0 && *count < mapSize / 4) {
