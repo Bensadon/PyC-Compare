@@ -125,6 +125,7 @@ def graficos_ordenacao(dc, dp):
             ("quick_sort", CORES["quick"], "C Quick Sort"),
         ]:
             f = filtrar(dc, tipo_dado=tipo, operacao=op)
+            f = [d for d in f if d["tempo_segundos"] >= 0]
             if f:
                 xs, ys = serie(f)
                 ax.plot(xs, ys, "o-", label=nome, lw=2, color=cor)
