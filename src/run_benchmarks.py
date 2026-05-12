@@ -21,7 +21,7 @@ import sys
 #  CONFIGURAÇÕES
 # ═══════════════════════════════════════
 
-TAMANHOS = [10, 100, 1_000, 10_000, 100_000]
+TAMANHOS = [10, 1_000, 100_000, 1_000_000]
 
 # Insertion sort é O(n²) — fica impraticável a partir de certo tamanho.
 # Definimos um limite para pular automaticamente.
