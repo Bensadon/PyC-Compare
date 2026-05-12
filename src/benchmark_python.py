@@ -16,7 +16,7 @@ import tracemalloc
 
 # ── CONFIGURAÇÕES ──
 
-TAMANHOS = [10, 100, 1_000, 10_000, 100_000]
+TAMANHOS = [10, 1_000, 100_000, 1_000_000]
 PASTA_DADOS = "dados"
 PASTA_RESULTADOS = "results"
 ARQUIVO_RESULTADO = os.path.join(PASTA_RESULTADOS, "resultados_python_v2.csv")

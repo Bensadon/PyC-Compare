@@ -21,8 +21,7 @@ import random
 import string
 
 PASTA_DADOS = "dados"
-TAMANHOS = [10, 100, 1_000, 10_000, 100_000]
-
+TAMANHOS = [10, 1_000, 100_000, 1_000_000]
 # Descomente para incluir tamanhos maiores (cuidado: arquivos de vários GB!)
 # TAMANHOS += [10_000_000, 100_000_000]
 

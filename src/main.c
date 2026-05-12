@@ -9,7 +9,7 @@
 #include <psapi.h>
 
 // Retorna o pico de memória do processo em bytes
-+size_t getPeakMemory () {
+size_t getPeakMemory () {
   PROCESS_MEMORY_COUNTERS pmc;
   if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc)))
     return pmc.PeakWorkingSetSize;
@@ -110,15 +110,19 @@ void benchmarkInt (const char *caminho, int tamanho, int multiplicador) {
   printCSV("inteiro", tamanho, "hash_remocao", somaTempos / nAmostras, 0);
   free(table);
 
-  // --- Insertion Sort ---
-  int *copia = copiarVetorInt(vetor, tamanho);
-  inicio = clock();
-  insertionSortInt(copia, tamanho);
-  fim = clock();
-  tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
-  printCSV("inteiro", tamanho, "insertion_sort", tempo, 0);
-  free(copia);
-
+// --- Insertion Sort ---
+  int *copia;
+  if (tamanho <= 100000) {
+    int *copia = copiarVetorInt(vetor, tamanho);
+    inicio = clock();
+    insertionSortInt(copia, tamanho);
+    fim = clock();
+    tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
+    printCSV("inteiro", tamanho, "insertion_sort", tempo, 0);
+    free(copia);
+  } else {
+    printCSV("inteiro", tamanho, "insertion_sort", -1, 0);
+}
   // --- Merge Sort ---
   copia = copiarVetorInt(vetor, tamanho);
   inicio = clock();
@@ -187,14 +191,18 @@ void benchmarkStr (const char *caminho, int tamanho, int multiplicador) {
   free(table);
 
   // --- Insertion Sort ---
-  char **copia = copiarVetorStr(vetor, tamanho);
-  inicio = clock();
-  insertionSortStr(copia, tamanho);
-  fim = clock();
-  tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
-  printCSV("string", tamanho, "insertion_sort", tempo, 0);
-  free(copia);
-
+  char **copia;
+  if (tamanho <= 100000) {
+    char **copia = copiarVetorStr(vetor, tamanho);
+    inicio = clock();
+    insertionSortStr(copia, tamanho);
+    fim = clock();
+    tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
+    printCSV("string", tamanho, "insertion_sort", tempo, 0);
+    free(copia);
+  } else {
+    printCSV("string", tamanho, "insertion_sort", -1, 0);
+  }
   // --- Merge Sort ---
   copia = copiarVetorStr(vetor, tamanho);
   inicio = clock();
